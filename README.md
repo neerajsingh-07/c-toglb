@@ -27,9 +27,21 @@ node server.js
 
 The server will start on `http://localhost:3000`
 
-## Deployment
+## Deployment & Exposing Local Server
 
-To make the API accessible to others, deploy it to a cloud platform. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+### Option 1: Expose Local Server (Quick)
+
+If you want others to use your local server, expose it using ngrok or similar tools. See [EXPOSE_LOCAL_SERVER.md](EXPOSE_LOCAL_SERVER.md) for detailed instructions.
+
+**Quick steps:**
+1. Install ngrok: https://ngrok.com/download
+2. Start your server: `node server.js`
+3. Expose it: `ngrok http 3000`
+4. Share the URL: `https://neerajsingh-07.github.io/c-toglb/?api=https://your-ngrok-url.ngrok.io`
+
+### Option 2: Deploy to Cloud (Permanent)
+
+To make the API permanently accessible, deploy it to a cloud platform. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
 
 **Quick Deploy Options:**
 - **Railway** (Recommended) - https://railway.app - Just connect GitHub repo

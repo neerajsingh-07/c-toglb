@@ -159,6 +159,11 @@
         <h1>🎨 Unity Script to GLB Converter</h1>
         <p class="subtitle">Upload your C# Unity script to convert it to a GLB 3D model</p>
         
+        <div class="status info" id="apiInfo" style="display: none;">
+            <strong>API Configuration:</strong> <span id="apiUrlDisplay"></span>
+            <br><small>To change, add ?api=YOUR_SERVER_URL to the URL</small>
+        </div>
+        
         <div class="upload-area" id="uploadArea">
             <div class="upload-icon">📁</div>
             <div class="upload-text">Click to upload or drag & drop</div>
@@ -184,6 +189,59 @@
         const loading = document.getElementById('loading');
         
         let selectedFile = null;
+        
+        // Display API URL info on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const apiUrl = getApiUrl();
+            const apiInfo = document.getElementById('apiInfo');
+            const apiUrlDisplay = document.getElementById('apiUrlDisplay');
+            
+            if (apiUrl) {
+                apiUrlDisplay.textContent = apiUrl;
+                apiInfo.style.display = 'block';
+            } else if (window.location.hostname.includes('github.io')) {
+                apiUrlDisplay.textContent = 'Not configured';
+                apiInfo.style.display = 'block';
+                apiInfo.className = 'status error';
+                apiInfo.innerHTML = `
+                    <strong>⚠️ API Server Required:</strong><br>
+                    This page needs to connect to a running API server.<br>
+                    <strong>Option 1:</strong> Add <code>?api=YOUR_SERVER_URL</code> to the URL<br>
+                    <strong>Option 2:</strong> Expose your local server using ngrok (see instructions below)<br>
+                    <small>Example: <code>?api=http://localhost:3000</code> or <code>?api=https://abc123.ngrok.io</code></small>
+                `;
+            }
+        });
+        
+        // Get API URL from URL parameter, localStorage, or default
+        function getApiUrl() {
+            // Check URL parameter first (e.g., ?api=http://localhost:3000)
+            const urlParams = new URLSearchParams(window.location.search);
+            const apiParam = urlParams.get('api');
+            if (apiParam) {
+                localStorage.setItem('apiUrl', apiParam);
+                return apiParam;
+            }
+            
+            // Check localStorage
+            const savedApiUrl = localStorage.getItem('apiUrl');
+            if (savedApiUrl) {
+                return savedApiUrl;
+            }
+            
+            // Default: use localhost if on localhost, otherwise try to detect
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://localhost:3000';
+            }
+            
+            // If on GitHub Pages, show error with instructions
+            if (window.location.hostname.includes('github.io')) {
+                return null; // Will show error message
+            }
+            
+            // Default to same origin
+            return window.location.origin;
+        }
         
         // Click to upload
         uploadArea.addEventListener('click', () => {
@@ -242,10 +300,12 @@
             try {
                 const fileContent = await readFile(selectedFile);
                 
-                // Determine API URL (works both locally and when deployed)
-                const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-                    ? 'http://localhost:3000'
-                    : window.location.origin;
+                // Get API URL
+                const API_URL = getApiUrl();
+                
+                if (!API_URL) {
+                    throw new Error('API URL not configured. Add ?api=YOUR_SERVER_URL to the URL (e.g., ?api=http://localhost:3000 or ?api=https://your-ngrok-url.ngrok.io)');
+                }
                 
                 // Send to API
                 const response = await fetch(`${API_URL}/api/upload`, {
@@ -277,7 +337,16 @@
                 showStatus('success', '✅ Successfully converted! GLB file downloaded.');
                 
             } catch (error) {
-                showStatus('error', `❌ Error: ${error.message}`);
+                let errorMessage = error.message;
+                
+                // Provide helpful error messages
+                if (error.message.includes('Unexpected token') || error.message.includes('JSON')) {
+                    errorMessage = 'API server not found or not responding. Make sure the server is running and accessible. If using GitHub Pages, add ?api=YOUR_SERVER_URL to the URL.';
+                } else if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+                    errorMessage = 'Cannot connect to API server. Make sure the server is running and accessible. If using GitHub Pages, add ?api=YOUR_SERVER_URL to the URL.';
+                }
+                
+                showStatus('error', `❌ Error: ${errorMessage}`);
             } finally {
                 convertBtn.disabled = false;
                 loading.style.display = 'none';
