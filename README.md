@@ -27,6 +27,18 @@ node server.js
 
 The server will start on `http://localhost:3000`
 
+## Deployment
+
+To make the API accessible to others, deploy it to a cloud platform. See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed instructions.
+
+**Quick Deploy Options:**
+- **Railway** (Recommended) - https://railway.app - Just connect GitHub repo
+- **Render** - https://render.com - Free tier available
+- **Heroku** - https://heroku.com - Classic platform
+- **Fly.io** - https://fly.io - Modern deployment platform
+
+All deployment configuration files are included in this repository.
+
 ## Usage
 
 ### Web Interface
