@@ -132,6 +132,23 @@
             border: 1px solid #bee5eb;
         }
         
+        .status code {
+            background: rgba(0, 0, 0, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+        
+        .status a {
+            color: #0c5460;
+            text-decoration: underline;
+        }
+        
+        .status.error a {
+            color: #721c24;
+        }
+        
         .loading {
             display: none;
             text-align: center;
@@ -160,8 +177,7 @@
         <p class="subtitle">Upload your C# Unity script to convert it to a GLB 3D model</p>
         
         <div class="status info" id="apiInfo" style="display: none;">
-            <strong>API Configuration:</strong> <span id="apiUrlDisplay"></span>
-            <br><small>To change, add ?api=YOUR_SERVER_URL to the URL</small>
+            <div id="apiInfoContent"></div>
         </div>
         
         <div class="upload-area" id="uploadArea">
@@ -194,22 +210,39 @@
         window.addEventListener('DOMContentLoaded', () => {
             const apiUrl = getApiUrl();
             const apiInfo = document.getElementById('apiInfo');
-            const apiUrlDisplay = document.getElementById('apiUrlDisplay');
+            const apiInfoContent = document.getElementById('apiInfoContent');
             
             if (apiUrl) {
-                apiUrlDisplay.textContent = apiUrl;
+                // API URL is configured
+                apiInfo.className = 'status info';
+                apiInfoContent.innerHTML = `
+                    <strong>✅ API Configuration:</strong> <code>${apiUrl}</code><br>
+                    <small>To change, add <code>?api=YOUR_SERVER_URL</code> to the URL</small>
+                `;
                 apiInfo.style.display = 'block';
             } else if (window.location.hostname.includes('github.io')) {
-                apiUrlDisplay.textContent = 'Not configured';
-                apiInfo.style.display = 'block';
+                // On GitHub Pages without API URL
                 apiInfo.className = 'status error';
-                apiInfo.innerHTML = `
+                apiInfoContent.innerHTML = `
                     <strong>⚠️ API Server Required:</strong><br>
-                    This page needs to connect to a running API server.<br>
-                    <strong>Option 1:</strong> Add <code>?api=YOUR_SERVER_URL</code> to the URL<br>
-                    <strong>Option 2:</strong> Expose your local server using ngrok (see instructions below)<br>
-                    <small>Example: <code>?api=http://localhost:3000</code> or <code>?api=https://abc123.ngrok.io</code></small>
+                    This page needs to connect to a running API server.<br><br>
+                    <strong>Quick Setup:</strong><br>
+                    1. Start your server: <code>node server.js</code><br>
+                    2. Expose it: <code>ngrok http 3000</code><br>
+                    3. Add the ngrok URL: <code>?api=https://your-ngrok-url.ngrok.io</code><br><br>
+                    <strong>Example URL:</strong><br>
+                    <code>${window.location.href}?api=https://abc123.ngrok.io</code><br><br>
+                    <small>See <a href="https://github.com/neerajsingh-07/c-toglb/blob/main/EXPOSE_LOCAL_SERVER.md" target="_blank">EXPOSE_LOCAL_SERVER.md</a> for detailed instructions</small>
                 `;
+                apiInfo.style.display = 'block';
+            } else {
+                // On localhost or other domains
+                apiInfo.className = 'status info';
+                apiInfoContent.innerHTML = `
+                    <strong>API Configuration:</strong> <code>${apiUrl || 'Not configured'}</code><br>
+                    <small>To change, add <code>?api=YOUR_SERVER_URL</code> to the URL</small>
+                `;
+                apiInfo.style.display = 'block';
             }
         });
         
