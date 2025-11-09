@@ -149,6 +149,15 @@
             color: #721c24;
         }
         
+        .status ol {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .status ol li {
+            margin: 5px 0;
+        }
+        
         .loading {
             display: none;
             text-align: center;
@@ -223,16 +232,23 @@
             } else if (window.location.hostname.includes('github.io')) {
                 // On GitHub Pages without API URL
                 apiInfo.className = 'status error';
+                const exampleUrl = `${window.location.href}?api=https://your-ngrok-url.ngrok.io`;
                 apiInfoContent.innerHTML = `
-                    <strong>⚠️ API Server Required:</strong><br>
+                    <strong>⚠️ API Server Required</strong><br>
                     This page needs to connect to a running API server.<br><br>
-                    <strong>Quick Setup:</strong><br>
-                    1. Start your server: <code>node server.js</code><br>
-                    2. Expose it: <code>ngrok http 3000</code><br>
-                    3. Add the ngrok URL: <code>?api=https://your-ngrok-url.ngrok.io</code><br><br>
-                    <strong>Example URL:</strong><br>
-                    <code>${window.location.href}?api=https://abc123.ngrok.io</code><br><br>
-                    <small>See <a href="https://github.com/neerajsingh-07/c-toglb/blob/main/EXPOSE_LOCAL_SERVER.md" target="_blank">EXPOSE_LOCAL_SERVER.md</a> for detailed instructions</small>
+                    <strong>Quick Setup (3 steps):</strong><br>
+                    <ol style="margin-left: 20px; margin-top: 10px;">
+                        <li>Start your server: <code>node server.js</code></li>
+                        <li>Expose it: <code>ngrok http 3000</code></li>
+                        <li>Add the ngrok URL to this page: <code>?api=https://your-ngrok-url.ngrok.io</code></li>
+                    </ol>
+                    <br>
+                    <strong>Example:</strong><br>
+                    <div style="background: #f8f9fa; padding: 10px; border-radius: 4px; margin-top: 8px; word-break: break-all;">
+                        <code style="font-size: 0.85em;">${exampleUrl}</code>
+                    </div>
+                    <br>
+                    <small>📖 See <a href="https://github.com/neerajsingh-07/c-toglb/blob/main/EXPOSE_LOCAL_SERVER.md" target="_blank" style="color: #721c24; text-decoration: underline;">EXPOSE_LOCAL_SERVER.md</a> for detailed instructions</small>
                 `;
                 apiInfo.style.display = 'block';
             } else {
